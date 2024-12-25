@@ -1,8 +1,8 @@
 package com.fire.bigevent.pojo;
 
-
-
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 
