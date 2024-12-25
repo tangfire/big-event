@@ -1,0 +1,8 @@
+spring:
+  application:
+    name: big-event
+  datasource:
+    url: jdbc:mysql://localhost:3306/big_event
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    username: root
+    password: 8888.216
