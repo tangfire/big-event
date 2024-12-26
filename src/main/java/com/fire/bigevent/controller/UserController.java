@@ -3,6 +3,8 @@ package com.fire.bigevent.controller;
 import com.fire.bigevent.pojo.Result;
 import com.fire.bigevent.pojo.User;
 import com.fire.bigevent.service.UserService;
+import com.fire.bigevent.utils.JwtUtil;
+import com.fire.bigevent.utils.Md5Util;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.constraints.Pattern;
@@ -11,6 +13,9 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.HashMap;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/user")
@@ -31,6 +36,30 @@ public class UserController {
         }else{
             return Result.error("用户名已被占用");
         }
+    }
+
+
+    @PostMapping("/login")
+    public Result<String> login(@Pattern(regexp = "^\\S{5,16}$") String username,@Pattern(regexp = "^\\S{5,16}$") String password){
+        // 根据用户名查询用户
+        User u = userService.findByUserName(username);
+        // 判断该用户是否存在
+        if (u == null){
+            return Result.error("用户名或密码错误");
+        }
+
+        // 判断密码是否正确
+        if(Md5Util.getMD5String(password).equals(u.getPassword())){
+            // 登录成功
+            Map<String,Object> claims = new HashMap<>();
+            claims.put("id",u.getId());
+            claims.put("username",u.getUsername());
+            String token = JwtUtil.genToken(claims);
+
+            return Result.success(token);
+        }
+
+        return Result.error("用户名或密码错误");
     }
 
 }
