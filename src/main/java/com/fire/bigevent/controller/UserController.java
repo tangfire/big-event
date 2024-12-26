@@ -5,14 +5,15 @@ import com.fire.bigevent.pojo.User;
 import com.fire.bigevent.service.UserService;
 import com.fire.bigevent.utils.JwtUtil;
 import com.fire.bigevent.utils.Md5Util;
+import com.fire.bigevent.utils.ThreadLocalUtil;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.constraints.Pattern;
+import org.apache.ibatis.io.ResolverUtil;
+import org.hibernate.validator.constraints.URL;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -61,5 +62,31 @@ public class UserController {
 
         return Result.error("用户名或密码错误");
     }
+
+    @GetMapping("/userInfo")
+    public Result<User> userInfo(){
+        Map<String,Object> claims = ThreadLocalUtil.get();
+        String username = (String) claims.get("username");
+
+        User user = userService.findByUserName(username);
+
+        return Result.success(user);
+    }
+
+
+    @PutMapping("/update")
+    public Result update(@RequestBody @Validated User user){
+        userService.update(user);
+
+        return Result.success();
+    }
+
+    @PatchMapping("/updateAvatar")
+    public Result updateAvatar(@RequestParam @URL String avatarUrl){
+        userService.updateAvatar(avatarUrl);
+        return Result.success();
+    }
+
+
 
 }
